@@ -6,42 +6,51 @@ var dwc = device.width/2;
 var dhc = device.height/2;
 var dw = device.width;
 var dh = device.height;
+log("加载屏幕参数完成")
+setScreenMetrics(1080, 2340);
+log("屏幕坐标适配完成")
+const {slide_time} = hamibot.env;
+log("开屏延时配置完成")
 const {gest} = hamibot.env;
+log("屏幕开启方向配置完成")
 const {email} = hamibot.env;
+log("邮箱配置完成")
 const {应用分身} = hamibot.env;
+log("发送模块加载完成")
 const {qunmingcheng} = hamibot.env;
-const {suoping} = hamibot.env;
+log("群名称加载完成")
 const {phonelock} = hamibot.env;
-log("应用配置加载成功")
+log("锁屏密码加载完成")
+log("配置加载成功")
 function sendEmail(email,etitle,emsg){
-  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=qauxinxishangbao@163.com&Password=YHGMOTAGCTYZPNNA&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
+  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的163邮箱名称&Password=SMTP授权码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
     if (err) {
       console.error("反馈邮件发送失败");
       return;
     }
-    log("邮箱加载成功");
   });
 }
-log("邮箱配置加载成功")
+log("邮件发送模块加载成功")
 sleep(3000)
+var a = Number(slide_time)
 if (gest=="up"){
     toast("上滑解锁")
-  	swipe(500,2000,500,500,300)
+  	swipe(500,2000,500,500,a)
   	log("上滑解锁成功")
 }
 if (gest=="down"){
   	toast("下滑解锁成功")
-    swipe(500,500,500,2000,300)
+    swipe(500,500,500,2000,a)
  		log("下滑解锁成功")
 }
 if (gest=="right"){
   	toast("右滑解锁成功")
-    swipe(0,700,1050,700,300)
+    swipe(0,700,1050,700,a)
   	log("右滑解锁成功")
 }
 if (gest=="left"){
   	toast("左滑解锁成功")
-    swipe(1050,700,0,700,300)
+    swipe(1050,700,0,700,a)
 	  log("左滑解锁成功")
 }
 //唤醒设备后上滑进入解锁界面
@@ -266,6 +275,76 @@ sleep(2000);
 id("mPostDetailActionBarLikeView").findOne().click();
 log("取消点赞")
 sleep(2000);
+back();
+sleep(2000)
+swipe(500,2000,500,500,300);
+log("下滑1次")
+sleep(3000);
+click(3,1230);
+log("进入第二个帖子")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("点赞")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("取消点赞")
+sleep(2000);
+back();
+sleep(2000)
+swipe(500,2000,500,500,300);
+log("下滑2次")
+sleep(3000);
+click(3,1230);
+log("进入第三个帖子")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("点赞")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("取消点赞")
+sleep(2000);
+back();
+sleep(2000)
+swipe(500,2000,500,500,300);
+log("下滑4次")
+sleep(3000);
+click(3,1230);
+log("进入第5个帖子")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("点赞")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("取消点赞")
+sleep(2000);
+back();
+sleep(2000)
+swipe(500,2000,500,500,300);
+log("下滑5次")
+sleep(3000);
+click(3,1230);
+log("进入第6个帖子")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("点赞")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("取消点赞")
+sleep(2000);
+back();
+sleep(2000);
+swipe(500,2000,500,500,300);
+log("下滑6次")
+sleep(3000);
+click(3,1230);
+log("进入第7个帖子")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("点赞")
+sleep(2000);
+id("mPostDetailActionBarLikeView").findOne().click();
+log("取消点赞")
+sleep(2000);
 while(!id("mHomeChannelSetting").exists()){
   log("检测是否回到主界面")
   back();
@@ -287,3 +366,61 @@ home();
 sleep(2000);
 launch('com.android.bbk.lockscreen3');
 exit()
+——————————————————————————————————————————————————————————————————————————————
+配置文件：
+
+[
+  {
+    "label": "解锁手势",
+    "type": "select",
+    "name": "gest",
+    "options": {
+      "no": "无",
+      "up": "上滑",
+      "down": "下滑",
+      "left": "左滑",
+      "right": "右滑"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "解锁延时",
+    "name": "slide_time",
+    "validation": "required"
+  },
+  {
+    "label": "屏幕锁定方式",
+    "type": "select",
+    "name": "phonelock",
+    "options": {
+      "a": "数字锁",
+      "b": "无锁"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "数字密码",
+    "name": "密码",
+    "validation": "required"
+  },
+  {
+    "label": "要转发的人或群的名称",
+    "name": "qunmingcheng",
+    "validation": "required"
+  },
+  {
+    "label": "邮箱",
+    "name": "email",
+    "validation": "required"
+  },
+  {
+    "label": "QQ是否有应用分身",
+    "type": "select",
+    "name": "应用分身",
+    "options": {
+      "a": "无",
+      "b": "有"
+    },
+    "validation": "required"
+  }
+]
