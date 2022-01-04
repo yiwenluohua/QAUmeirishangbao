@@ -270,3 +270,65 @@ hamibot.postMessage(Date.now().toString(), {
   },
 });
 exit()
+——————————————————————以下为配置文件————————————————————
+[
+  {
+    "label": "解锁手势",
+    "type": "select",
+    "name": "gest",
+    "options": {
+      "no": "无",
+      "up": "上滑",
+      "down": "下滑",
+      "left": "左滑",
+      "right": "右滑"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "解锁延时",
+    "name": "slide_time",
+    "validation": "required"
+  },
+  {
+    "label": "屏幕锁定方式",
+    "type": "select",
+    "name": "phonelock",
+    "options": {
+      "a": "数字锁",
+      "c": "无锁"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "锁屏密码",
+    "name": "mima",
+    "validation": "required"
+  },
+  {
+    "label": "要转发的人或群的名称",
+    "name": "qunmingcheng",
+    "validation": "required"
+  },
+  {
+    "label": "邮箱",
+    "name": "email",
+    "validation": "required"
+  },
+  {
+    "label": "QQ是否有应用分身",
+    "type": "select",
+    "name": "应用分身",
+    "options": {
+      "a": "无",
+      "b": "有"
+    },
+    "validation": "required"
+  },
+  {
+    "name": "TELEMETRY",
+    "type": "checkbox",
+    "label": "发送使用数据和错误报告",
+    "help": "帮助开发者改进脚本，这个报告会被认为是机密的，匿名的。"
+  }
+]
