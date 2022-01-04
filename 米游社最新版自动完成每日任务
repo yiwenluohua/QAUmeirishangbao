@@ -20,10 +20,11 @@ log("发送模块加载完成")
 const {qunmingcheng} = hamibot.env;
 log("群名称加载完成")
 const {phonelock} = hamibot.env;
+const {mima} = hamibot.env;//读取配置中的密码
 log("锁屏密码加载完成")
 log("配置加载成功")
 function sendEmail(email,etitle,emsg){
-  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的163邮箱名称&Password=SMTP授权码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
+  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的邮箱&Password=SMTP授权码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
     if (err) {
       console.error("反馈邮件发送失败");
       return;
@@ -56,12 +57,12 @@ if (gest=="left"){
 //唤醒设备后上滑进入解锁界面
 sleep(1000)
 if (phonelock = "a"){
-  const {密码} = hamibot.env;//读取配置中的密码
-  var str = 密码.toString();
+  var str = mima.toString();
   var arr = str.split("");//将密码转为数组
   for(var x = 0 ; x < arr.length ; x = x + 1){
     desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
-    log("开始运行解锁部分")
+    var c = x + 1
+    log("输入第", c ,"位密码中，请稍后……")
     sleep(100);
   }
 }
@@ -100,27 +101,27 @@ if(id("mHomeChannelSetting").exists()){
   log("警告发生未知错误，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   sendEmail(email,"未知错误，请联系开发者","警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+    hamibot.postMessage(Date.now().toString(), {
+  	telemetry: true,
+ 		data: {
+    title: '错误报告',
+  	  attachments: [
+  	    {
+  	      type: 'text',
+	        data: '错误区间1-111，类型：未进入米游社',
+	      },
+	    ],
+	  },
+	});
   exit()
 }
-gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
-log("开始切换模块")
-sleep(3000);
-gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
-log("开始切换模块")
-sleep(3000);
-gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
-log("开始切换模块")
-sleep(3000);
-gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
-log("开始切换模块")
-sleep(3000);
-gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
-log("开始切换模块")
-sleep(3000);
-gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
-log("开始切换模块")
-sleep(7000);
-while(!click('进入讨论区'));
+for(var i = 1; i < 7; i++){
+	gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
+	log("正在进行第",i,"次切换模块")
+	sleep(2000);
+}
+sleep(5000);
+while(!click('进入讨论区',0));
 log("执行进入讨论区的操作")
 sleep(3000);
 click(3,1230);
@@ -149,7 +150,19 @@ if(id("et_search_keyword").exists()){
   log("警告发生未知错误，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   sendEmail(email,"未知错误，请联系开发者","警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  exit()
+    hamibot.postMessage(Date.now().toString(), {
+  	telemetry: true,
+ 		data: {
+    title: '错误报告',
+  	  attachments: [
+  	    {
+  	      type: 'text',
+	        data: '未进入qq分享页面',
+	      },
+	    ],
+	  },
+	});
+	exit();
 }
 id("et_search_keyword").findOne().click();
 log("点击搜索栏")
@@ -166,185 +179,25 @@ sleep(2000);
 id("dialogLeftBtn").findOne().click();
 log("点击左侧按钮")
 sleep(2000);
-while(!id("mHomeChannelSetting").exists()){
-  log("检测是否回到主界面")
-  back();
-  log("执行一次返回操作")
-  sleep(1000);
-}
-sleep(1000);
-gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
-log("开始切换模块")
-sleep(4000);
-while(!click('进入讨论区'));
-log("执行进入讨论区的操作")
-sleep(3000);
-click(3,1230);
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-while(!id("mHomeChannelSetting").exists()){
-  log("检测是否回到主界面")
-  back();
-  log("执行一次返回操作")
-  sleep(1000);
-}
-sleep(1000);
-gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
-log("开始切换模块")
-sleep(4000);
-while(!click('进入讨论区'));
-log("执行进入讨论区的操作")
-sleep(3000);
-click(3,1230);
-log("进入第一个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(1000);
-while(!id("mHomeChannelSetting").exists()){
-  log("检测是否回到主界面")
-  back();
-  log("执行一次返回操作")
-  sleep(1000);
-}
-sleep(1000);
-gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
-log("开始切换模块")
-sleep(4000);
-while(!click('进入讨论区'));
-log("执行进入讨论区的操作")
-sleep(3000);
-click(3,1230);
-log("进入第一个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-while(!id("mHomeChannelSetting").exists()){
-  log("检测是否回到主界面")
-  back();
-  log("执行一次返回操作")
-  sleep(1000);
-}
-sleep(1000);
-gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
-log("开始切换模块")
-sleep(4000);
-while(!click('进入讨论区'));
-log("执行进入讨论区的操作")
-sleep(3000);
-click(3,1230);
-log("进入第一个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-while(!id("mHomeChannelSetting").exists()){
-  log("检测是否回到主界面")
-  back();
-  log("执行一次返回操作")
-  sleep(1000);
-}
-sleep(1000);
-gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
-log("开始切换模块")
-sleep(4000);
-while(!click('进入讨论区'));
-log("执行进入讨论区的操作")
-sleep(3000);
-click(3,1230);
-log("进入第一个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
 back();
-sleep(2000)
-swipe(500,2000,500,500,300);
-log("下滑1次")
-sleep(3000);
-click(3,1230);
-log("进入第二个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-back();
-sleep(2000)
-swipe(500,2000,500,500,300);
-log("下滑2次")
-sleep(3000);
-click(3,1230);
-log("进入第三个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-back();
-sleep(2000)
-swipe(500,2000,500,500,300);
-log("下滑4次")
-sleep(3000);
-click(3,1230);
-log("进入第5个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-back();
-sleep(2000)
-swipe(500,2000,500,500,300);
-log("下滑5次")
-sleep(3000);
-click(3,1230);
-log("进入第6个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
-back();
-sleep(2000);
-swipe(500,2000,500,500,300);
-log("下滑6次")
-sleep(3000);
-click(3,1230);
-log("进入第7个帖子")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
-sleep(2000);
+for(var i = 0; i < 7; i = i + 1){
+  var z = i + 1
+  var c = i + 2
+  sleep(500)
+  swipe(20,2200,20,600,500);
+	log("下滑",z,"次")
+	sleep(3000);
+	click(3,1230);
+	log("进入第",c,"个帖子")
+	sleep(2000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("点赞")
+	sleep(2000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("取消点赞")
+	sleep(2000);
+	back();
+}
 while(!id("mHomeChannelSetting").exists()){
   log("检测是否回到主界面")
   back();
@@ -352,75 +205,68 @@ while(!id("mHomeChannelSetting").exists()){
   sleep(1000);
 }
 sleep(1000);
+for(var i = 0;i < 5;i = i + 1){
+  var x = i + 2
+  var z = i + 8
+  gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
+  log("进入第",x,"个模块")
+  sleep(4000);
+  while(!click('进入讨论区'));
+	log("执行进入讨论区的操作")
+	sleep(3000);
+	click(3,1230);
+	log("进入第",z,"个帖子")
+	sleep(2000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("点赞")
+	sleep(2000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("取消点赞")
+	sleep(1000);
+	while(!id("mHomeChannelSetting").exists()){
+	  log("检测是否回到主界面")
+	  back();
+	  log("执行一次返回操作")
+	  sleep(1000);
+	}
+	sleep(1000);
+}
 while(!click(900,2222));
 log("检查任务是否完成")
 sleep(5000)
 if(id("coinContentTv").className("android.widget.TextView").text("已完成今日任务").exists()){
 	sendEmail(email,"米游社自动获取米游币回执","您已完成日常活动的所有米游币的获取")
 }else{
-  sendEmail(email,"出现未知错误","警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  sendEmail(email,"出现未知错误","警告发生未知错误,米游币未完全获取，请检测是否勾选全部板块。若已勾选全部板块，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  hamibot.postMessage(Date.now().toString(), {
+  	telemetry: true,
+ 		data: {
+    title: '错误报告',
+  	  attachments: [
+  	    {
+  	      type: 'text',
+	        data: '米游币未完全获取',
+	      },
+	    ],
+	  },
+	});
+	exit();
 }
 while(!click(20,2222));
 log("返回米游社主页面")
 home();
 sleep(2000);
 launch('com.android.bbk.lockscreen3');
+hamibot.postMessage(Date.now().toString(), {
+  telemetry: true,
+  data: {
+    title: '正常使用报告',
+    attachments: [
+      {
+        type: 'text',
+        data: '脚本运行正常',
+      },
+    ],
+  },
+});
 exit()
-——————————————————————————————————————————————————————————————————————————————
-配置文件：
-
-[
-  {
-    "label": "解锁手势",
-    "type": "select",
-    "name": "gest",
-    "options": {
-      "no": "无",
-      "up": "上滑",
-      "down": "下滑",
-      "left": "左滑",
-      "right": "右滑"
-    },
-    "validation": "required"
-  },
-  {
-    "label": "解锁延时",
-    "name": "slide_time",
-    "validation": "required"
-  },
-  {
-    "label": "屏幕锁定方式",
-    "type": "select",
-    "name": "phonelock",
-    "options": {
-      "a": "数字锁",
-      "b": "无锁"
-    },
-    "validation": "required"
-  },
-  {
-    "label": "数字密码",
-    "name": "密码",
-    "validation": "required"
-  },
-  {
-    "label": "要转发的人或群的名称",
-    "name": "qunmingcheng",
-    "validation": "required"
-  },
-  {
-    "label": "邮箱",
-    "name": "email",
-    "validation": "required"
-  },
-  {
-    "label": "QQ是否有应用分身",
-    "type": "select",
-    "name": "应用分身",
-    "options": {
-      "a": "无",
-      "b": "有"
-    },
-    "validation": "required"
-  }
-]
