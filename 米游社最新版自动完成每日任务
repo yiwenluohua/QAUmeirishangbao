@@ -1,27 +1,17 @@
 auto.waitFor();
-log("无障碍权限加载成功");
-device.wakeUpIfNeeded()
-log("屏幕已唤醒");
 var dwc = device.width/2;
 var dhc = device.height/2;
 var dw = device.width;
 var dh = device.height;
-log("加载屏幕参数完成")
-setScreenMetrics(1080, 2340);
-log("屏幕坐标适配完成")
-const {slide_time} = hamibot.env;
-log("开屏延时配置完成")
-const {gest} = hamibot.env;
-log("屏幕开启方向配置完成")
-const {email} = hamibot.env;
-log("邮箱配置完成")
-const {应用分身} = hamibot.env;
-log("发送模块加载完成")
-const {qunmingcheng} = hamibot.env;
-log("群名称加载完成")
-const {phonelock} = hamibot.env;
+//加载屏幕相关参数
+setScreenMetrics(1080, 2340);//设定初始屏幕比例
+const {slide_time} = hamibot.env;//载入滑屏时间
+const {gest} = hamibot.env;//载入开屏方式
+const {email} = hamibot.env;//载入邮箱
+const {应用分身} = hamibot.env;//载入是否有QQ应用分身
+const {qunmingcheng} = hamibot.env;//载入要发送的群名称
+const {phonelock} = hamibot.env;//载入密码方式
 const {mima} = hamibot.env;//读取配置中的密码
-log("锁屏密码加载完成")
 log("配置加载成功")
 function sendEmail(email,etitle,emsg){
   http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的邮箱&Password=SMTP授权码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
@@ -32,6 +22,7 @@ function sendEmail(email,etitle,emsg){
   });
 }
 log("邮件发送模块加载成功")
+device.wakeUpIfNeeded()
 sleep(3000)
 var a = Number(slide_time)
 if (gest=="up"){
@@ -68,7 +59,7 @@ if (phonelock = "a"){
 }
 log("锁屏解锁完成")
 sleep(1000);
-// 启动 Hamibot
+// 启动 米游社
 launchApp('米游社');
 log("米游社正常开启")
 //暂停4~5秒，过开屏动画
@@ -101,7 +92,7 @@ if(id("mHomeChannelSetting").exists()){
   log("警告发生未知错误，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   sendEmail(email,"未知错误，请联系开发者","警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-    hamibot.postMessage(Date.now().toString(), {
+  hamibot.postMessage(Date.now().toString(), {
   	telemetry: true,
  		data: {
     title: '错误报告',
@@ -127,11 +118,29 @@ sleep(3000);
 click(3,1230);
 log("进入第一个帖子")
 sleep(2000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("点赞")
-sleep(4000);
-id("mPostDetailActionBarLikeView").findOne().click();
-log("取消点赞")
+if(id("mPostDetailActionBarLikeView").exists()){
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("点赞")
+	sleep(4000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("取消点赞")
+}else{
+	log("警告：检测到被删除的帖子，由于您的脚本为BATA版本，开始使用bata内容，开始寻找未被删除的帖子，该功能可能会导致脚本异常")
+  do{
+	    back();
+	    sleep(2000)
+	    var x = 1
+	    log("正在寻找第",x,"个帖子")
+	    swipe(20,2200,20,600,500);
+	    click(3,1230);
+			sleep(2000);
+	}while(!id("mPostDetailActionBarLikeView").exists());
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("点赞")
+	sleep(4000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("取消点赞")
+}
 sleep(2000);
 id("mPostDetailActionBarIvMore").findOne().click();
 log("开始分享")
@@ -172,10 +181,11 @@ log("填写提前设置好的文本")
 sleep(2000);
 className("android.widget.RelativeLayout").clickable(true).depth(8).findOne().click();
 log("点击搜索结果,警告，请给需要分享的群或用户起一个没有重复的名字，不然会发生未知错误")
-sleep(2000);
+id("dialogRightBtn").waitFor();
 id("dialogRightBtn").findOne().click();
 log("点击右侧按钮")
 sleep(2000);
+id("dialogLeftBtn").waitFor();
 id("dialogLeftBtn").findOne().click();
 log("点击左侧按钮")
 sleep(2000);
@@ -190,12 +200,31 @@ for(var i = 0; i < 7; i = i + 1){
 	click(3,1230);
 	log("进入第",c,"个帖子")
 	sleep(2000);
-	id("mPostDetailActionBarLikeView").findOne().click();
-	log("点赞")
-	sleep(2000);
-	id("mPostDetailActionBarLikeView").findOne().click();
-	log("取消点赞")
-	sleep(2000);
+  if(id("mPostDetailActionBarLikeView").exists()){
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(2000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+  }else{
+		log("警告：检测到被删除的帖子，由于您的脚本为BATA版本，开始使用bata内容，开始寻找未被删除的帖子，该功能可能会导致脚本异常")
+	  do{
+		  back();
+		  sleep(2000)
+	    var x = 1
+	    log("正在寻找第",x,"个帖子")
+			swipe(20,2200,20,600,500);
+		  click(3,1230);
+			sleep(2000);
+	  }
+	  while(!id("mPostDetailActionBarLikeView").exists());
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(4000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+  }
+  sleep(2000);
 	back();
 }
 while(!id("mHomeChannelSetting").exists()){
@@ -207,21 +236,41 @@ while(!id("mHomeChannelSetting").exists()){
 sleep(1000);
 for(var i = 0;i < 5;i = i + 1){
   var x = i + 2
-  var z = i + 8
+  var z = i + 9
   gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
   log("进入第",x,"个模块")
   sleep(4000);
   while(!click('进入讨论区'));
 	log("执行进入讨论区的操作")
 	sleep(3000);
+  this.jianchadian2
 	click(3,1230);
 	log("进入第",z,"个帖子")
 	sleep(2000);
-	id("mPostDetailActionBarLikeView").findOne().click();
-	log("点赞")
-	sleep(2000);
-	id("mPostDetailActionBarLikeView").findOne().click();
-	log("取消点赞")
+  if(id("mPostDetailActionBarLikeView").exists()){
+    id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(2000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+  }else{
+		log("警告：检测到被删除的帖子，由于您的脚本为BATA版本，开始使用bata内容，开始寻找未被删除的帖子，该功能可能会导致脚本异常")
+  	do{
+	    back();
+	    sleep(2000)
+	    var x = 1
+	    log("正在寻找第",x,"个帖子")
+	    swipe(20,2200,20,600,500);
+	    click(3,1230);
+			sleep(2000);
+	  }while(!id("mPostDetailActionBarLikeView").exists());
+	  id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(4000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+		sleep(2000);
+  }
 	sleep(1000);
 	while(!id("mHomeChannelSetting").exists()){
 	  log("检测是否回到主界面")
