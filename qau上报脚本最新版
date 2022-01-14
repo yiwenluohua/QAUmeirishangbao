@@ -37,32 +37,36 @@ if (phonelock = "a"){
   var str = 密码.toString();
   var arr = str.split("");//将密码转为数组
   for(var i = 0 ; i < arr.length ; i = i + 1){
-  desc(arr[i]).findOne().click();//依此读取数字中的数字并进行输入解锁
-  sleep(100);
+		desc(arr[i]).findOne().click();//依此读取数字中的数字并进行输入解锁
+    sleep(100);
   }
 }
+log('【测试版本1.3.2】','1、重写了微信主界面检测程序。','2、警告，在关注hamibot微信公众号后，hamibot 1.30测试版本不会正常打开微信公众号，将会在hamibot微信公众号页面发生未知错乱（包括乱点导致无法从悬浮窗关闭脚本等众多bug）','应急解决方案：','1、不安装测试版本，更改为1.10正式版','2、取消hamibot公众号的关注')
 sleep(3000);
 log('开始打卡');
 launch('com.tencent.mm');
-sleep(1000)
+sleep(3000)
 if(id("dub").className("android.widget.TextView").text("通讯录").exists()){
   log('处于微信主界面')
 }else{
   log('未处于微信主界面，开始执行返回操作')
-  while (!id("dub").className("android.widget.TextView").text("通讯录").exists()) {
-    back();
-    sleep(1000)
+	for(var i = 0; i < 20; i++){
+    back()
+    sleep(100)
   }
+  launch('com.tencent.mm');
 }
 sleep(2000)
 log('开始每日上报流程');
 sleep(300);
 while (!click('通讯录'));
 while (!click('公众号'));
+sleep(2000)
 while(!click('青岛农业大学学工在线')){
   swipe(500, 2000, 500, 200, 300);
   sleep(100);
 }
+sleep(2000)
 log('进入青岛农业大学学工在线公众号')
 while (!click('信息上报'));
 className("android.view.View").text("每日上报").waitFor()
@@ -70,15 +74,11 @@ log('等待加载页面')
 while(!className("android.view.View").text("每日上报").findOne().click());
 toast('每日上报');
 log('开始执行每日上报流程')
-sleep(3000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
-swipe(500, 2000, 500, 200, 1000);
+sleep(4000);
+for(var i = 0;i < 10 ; i++){
+  sleep(200)
+	swipe(500, 2000, 500, 200, 1000);
+}
 while(!click('本人承诺以上填报数据真实有效。（请打勾后提交数据）'));
 sleep(500);
 while(!click(535,2260));
@@ -92,3 +92,39 @@ sleep(100);
 launch('com.android.bbk.lockscreen3');
 log('脚本执行完毕')
 exit();
+------------------------------配置文件--------------------------------------
+[
+  {
+    "label": "解锁手势",
+    "type": "select",
+    "name": "gest",
+    "options": {
+      "no": "无",
+      "up": "上滑",
+      "down": "下滑",
+      "left": "左滑",
+      "right": "右滑"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "屏幕锁定方式",
+    "type": "select",
+    "name": "phonelock",
+    "options": {
+      "a": "数字锁",
+      "b": "无锁"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "数字密码",
+    "name": "密码",
+    "validation": "required"
+  },
+  {
+    "label": "邮箱",
+    "name": "email",
+    "validation": "required"
+  }
+]
