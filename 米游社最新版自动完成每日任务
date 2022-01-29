@@ -1,4 +1,5 @@
 auto.waitFor();
+var Banben = "A09"
 var dwc = device.width/2;
 var dhc = device.height/2;
 var dw = device.width;
@@ -14,7 +15,7 @@ const {phonelock} = hamibot.env;//载入密码方式
 const {mima} = hamibot.env;//读取配置中的密码
 log("配置加载成功")
 function sendEmail(email,etitle,emsg){
-  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的邮箱&Password=SMTP授权码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
+  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的邮箱&Password=请填写你自己的SMTP码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
     if (err) {
       console.error("反馈邮件发送失败");
       return;
@@ -25,48 +26,68 @@ log("邮件发送模块加载成功")
 device.wakeUpIfNeeded()
 sleep(3000)
 var a = Number(slide_time)
-if (gest=="up"){
-    toast("上滑解锁")
-  	swipe(500,2000,500,500,a)
-  	log("上滑解锁成功")
-}
-if (gest=="down"){
-  	toast("下滑解锁成功")
-    swipe(500,500,500,2000,a)
- 		log("下滑解锁成功")
-}
-if (gest=="right"){
-  	toast("右滑解锁成功")
-    swipe(0,700,1050,700,a)
-  	log("右滑解锁成功")
-}
-if (gest=="left"){
-  	toast("左滑解锁成功")
-    swipe(1050,700,0,700,a)
-	  log("左滑解锁成功")
+var No = "no", Up = "up", Down = "down", Right = "right", Left = "left";
+switch (gest) {
+  case No : 
+    log("无需上滑解锁");
+    break;
+  case Up :
+    swipe(500,2000,500,500,a)
+    log("上滑解锁成功");
+    sleep(1000);
+    break;
+  case Down :
+    swipe(500,500,500,2000,a);
+    log("下滑解锁成功");
+    sleep(1000);
+    break;
+  case Right :
+    swipe(0,700,1050,700,a);
+    log("右滑解锁成功");
+    sleep(1000);
+    break;
+  case Left :
+    swipe(1050,700,0,700,a);
+    log("左滑解锁成功");
+    sleep(1000);
+    break;
 }
 //唤醒设备后上滑进入解锁界面
-sleep(1000)
-if (phonelock = "a"){
-  var str = mima.toString();
-  var arr = str.split("");//将密码转为数组
-  for(var x = 0 ; x < arr.length ; x = x + 1){
-    desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
-    var c = x + 1
-    log("输入第", c ,"位密码中，请稍后……")
-    sleep(100);
-  }
+var A = "a", B = "b", C = "c";
+switch (phonelock) {
+  case A :
+    var str = mima.toString();
+    var arr = str.split("");//将密码转为数组
+    for(var x = 0 ; x < arr.length ; x = x + 1){
+      desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
+      var c = x + 1
+      log("输入第", c ,"位密码中，请稍后……")
+      sleep(100);
+    };
+    sleep(1000);
+    break;
+  case B :
+    log("图形锁解锁待制作，请稍后再试")
+    sleep(1000);
+    break;
+  case C :
+    log("未锁定，开始执行正常流程。");
+    break;
 }
-log("锁屏解锁完成")
-sleep(1000);
+toast("2022年，新年快乐！作者在这里给大家拜年啦！")
+sleep(100)
+toast("您的当前版本为：A09")
+sleep(100)
+toast("欢迎加入脚本交流群：772442302，密码：咸鱼")
+log("2022年，新年快乐！当前版本为：", Banben, "欢迎加入脚本交流群：772442302，密码：咸鱼")
 // 启动 米游社
-launchApp('米游社');
+var name = getPackageName('米游社'); // 返回 com.hamibot.hamibot
+launch(name);
 log("米游社正常开启")
 //暂停4~5秒，过开屏动画
 sleep(7000);
-if (id("homepageTv").exists()){
-  while(!click(20,2222));
-  log("检测到位于“我的”页面，开始执行返回操作")
+if(id("mHomeChannelSetting").exists()){
+  log("检测到米游社主页控件，开始执行后续步骤")
 }
 if(id("mUpgradeDialogOk").exists()){
   log("检测更新弹窗");
@@ -86,24 +107,20 @@ if (id("homepageTv").exists()){
   while(!click(20,2222));
   log("检测到位于“我的”页面，开始执行返回操作")
 }
+if (id("mTabLayoutTabTvTitle").className("android.widget.TextView").text("发现").exists()){
+  while(!click(20,2222));
+  log("检测到位于“动态”页面，开始执行返回操作")
+}
+if (id("msgTv").exists()){
+  while(!click(20,2222));
+  log("检测到位于“消息”页面，开始执行返回操作")
+}
 if(id("mHomeChannelSetting").exists()){
   log("检测到米游社主页控件，开始执行后续步骤")
 }else{
-  log("警告发生未知错误，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  sendEmail(email,"未知错误，请联系开发者","警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  log("警告未正常开启米游社软件，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  sendEmail(email,"错误，请联系开发者","未正常开启米游社软件，请确认是否安装米游社等。")
   toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  hamibot.postMessage(Date.now().toString(), {
-  	telemetry: true,
- 		data: {
-    title: '错误报告',
-  	  attachments: [
-  	    {
-  	      type: 'text',
-	        data: '错误区间1-111，类型：未进入米游社',
-	      },
-	    ],
-	  },
-	});
   exit()
 }
 for(var i = 1; i < 7; i++){
@@ -125,13 +142,16 @@ if(id("mPostDetailActionBarLikeView").exists()){
 	id("mPostDetailActionBarLikeView").findOne().click();
 	log("取消点赞")
 }else{
-	log("警告：检测到被删除的帖子，由于您的脚本为BATA版本，开始使用bata内容，开始寻找未被删除的帖子，该功能可能会导致脚本异常")
+	log("检测到被删除的帖子，开始寻找未被删除的帖子")
   do{
 	    back();
 	    sleep(2000)
 	    var x = 1
 	    log("正在寻找第",x,"个帖子")
-	    swipe(20,2200,20,600,500);
+    	for(var xiahua = 1; xiahua < 3; xiahua++){
+	    	swipe(20,1600,20,600,500);
+        sleep(200)
+      }
 	    click(3,1230);
 			sleep(2000);
 	}while(!id("mPostDetailActionBarLikeView").exists());
@@ -153,34 +173,27 @@ if(应用分身=="b"){
   log("进入第一个qq")
 }
 sleep(5000);
-if(id("et_search_keyword").exists()){
+if(id("ivTitleName").text("发送给").exists()){
   log("检测到搜索模块,正常运行")
 }else{
-  log("警告发生未知错误，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  sendEmail(email,"未知错误，请联系开发者","警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-    hamibot.postMessage(Date.now().toString(), {
-  	telemetry: true,
- 		data: {
-    title: '错误报告',
-  	  attachments: [
-  	    {
-  	      type: 'text',
-	        data: '未进入qq分享页面',
-	      },
-	    ],
-	  },
-	});
-	exit();
+  log("警告未检测到分享页面关闭按钮，请自行查看是否分享成功，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  var 未检测到分享页面关闭按钮 = "未检测到分享页面关闭按钮"
 }
-id("et_search_keyword").findOne().click();
-log("点击搜索栏")
+if(id("et_search_keyword").exists()){
+  id("et_search_keyword").findOne().click();
+	log("点击搜索栏")
+}else if(id("ik5").exists()){
+  id("ik5").findOne().click();
+  log("点击搜索栏");
+}else{
+  log("请联系作者修改脚本。")
+}
 sleep(2000);
 setText(0,qunmingcheng);
 log("填写提前设置好的文本")
 sleep(2000);
 className("android.widget.RelativeLayout").clickable(true).depth(8).findOne().click();
-log("点击搜索结果,警告，请给需要分享的群或用户起一个没有重复的名字，不然会发生未知错误")
+log("点击搜索结果，警告，请给需要分享的群或用户起一个没有重复的名字，不然会发生未知错误")
 id("dialogRightBtn").waitFor();
 id("dialogRightBtn").findOne().click();
 log("点击右侧按钮")
@@ -194,7 +207,10 @@ for(var i = 0; i < 7; i = i + 1){
   var z = i + 1
   var c = i + 2
   sleep(500)
-  swipe(20,2200,20,600,500);
+  for(var xiahua = 0; xiahua < 3; xiahua++){
+  	swipe(20,1600,20,600,500);
+    sleep(200)
+  }
 	log("下滑",z,"次")
 	sleep(3000);
 	click(3,1230);
@@ -207,13 +223,16 @@ for(var i = 0; i < 7; i = i + 1){
 		id("mPostDetailActionBarLikeView").findOne().click();
 		log("取消点赞")
   }else{
-		log("警告：检测到被删除的帖子，由于您的脚本为BATA版本，开始使用bata内容，开始寻找未被删除的帖子，该功能可能会导致脚本异常")
+		log("检测到被删除的帖子，开始寻找未被删除的帖子")
 	  do{
 		  back();
 		  sleep(2000)
 	    var x = 1
 	    log("正在寻找第",x,"个帖子")
-			swipe(20,2200,20,600,500);
+      for(var xiahua = 0; xiahua < 3; xiahua++){
+				swipe(20,1600,20,600,500);
+      	sleep(200)
+      }
 		  click(3,1230);
 			sleep(2000);
 	  }
@@ -254,13 +273,16 @@ for(var i = 0;i < 5;i = i + 1){
 		id("mPostDetailActionBarLikeView").findOne().click();
 		log("取消点赞")
   }else{
-		log("警告：检测到被删除的帖子，由于您的脚本为BATA版本，开始使用bata内容，开始寻找未被删除的帖子，该功能可能会导致脚本异常")
+		log("检测到被删除的帖子，开始寻找未被删除的帖子")
   	do{
 	    back();
 	    sleep(2000)
 	    var x = 1
 	    log("正在寻找第",x,"个帖子")
-	    swipe(20,2200,20,600,500);
+      for(var xiahua = 0; xiahua < 3; xiahua++){
+	    	swipe(20,1600,20,600,500);
+        sleep(200);
+      }
 	    click(3,1230);
 			sleep(2000);
 	  }while(!id("mPostDetailActionBarLikeView").exists());
@@ -285,39 +307,22 @@ log("检查任务是否完成")
 sleep(5000)
 if(id("coinContentTv").className("android.widget.TextView").text("已完成今日任务").exists()){
 	sendEmail(email,"米游社自动获取米游币回执","您已完成日常活动的所有米游币的获取")
+  if (未检测到分享页面关闭按钮 = "未检测到分享页面关闭按钮"){
+    sendEmail(email,"您已成功分享","检测模块存在bug，制作员正在加紧修复中。")
+  }
 }else{
   sendEmail(email,"出现未知错误","警告发生未知错误,米游币未完全获取，请检测是否勾选全部板块。若已勾选全部板块，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  hamibot.postMessage(Date.now().toString(), {
-  	telemetry: true,
- 		data: {
-    title: '错误报告',
-  	  attachments: [
-  	    {
-  	      type: 'text',
-	        data: '米游币未完全获取',
-	      },
-	    ],
-	  },
-	});
-	exit();
+	log("上述流程出现未知错误，请检测是否开启权限等，并将日志发送到开发者：yiwenluohua@163.com")
+  if (未检测到分享页面关闭按钮 = "未检测到分享页面关闭按钮"){
+    sendEmail(email,"您未成功分享","因为您未成功分享引起的异常，请手动分享")
+  }
+  exit();
 }
 while(!click(20,2222));
 log("返回米游社主页面")
 home();
 sleep(2000);
 launch('com.android.bbk.lockscreen3');
-hamibot.postMessage(Date.now().toString(), {
-  telemetry: true,
-  data: {
-    title: '正常使用报告',
-    attachments: [
-      {
-        type: 'text',
-        data: '脚本运行正常',
-      },
-    ],
-  },
-});
 exit()
 ——————————————————————以下为配置文件————————————————————
 [
@@ -373,11 +378,5 @@ exit()
       "b": "有"
     },
     "validation": "required"
-  },
-  {
-    "name": "TELEMETRY",
-    "type": "checkbox",
-    "label": "发送使用数据和错误报告",
-    "help": "帮助开发者改进脚本，这个报告会被认为是机密的，匿名的。"
   }
 ]
