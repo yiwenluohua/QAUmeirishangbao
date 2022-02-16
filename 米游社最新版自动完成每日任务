@@ -1,5 +1,5 @@
 auto.waitFor();
-var Banben = "A09"
+var Banben = "A10"
 var dwc = device.width/2;
 var dhc = device.height/2;
 var dw = device.width;
@@ -8,19 +8,28 @@ var dh = device.height;
 setScreenMetrics(1080, 2340);//设定初始屏幕比例
 const {slide_time} = hamibot.env;//载入滑屏时间
 const {gest} = hamibot.env;//载入开屏方式
-const {email} = hamibot.env;//载入邮箱
+const {email} = hamibot.env;//载入信息推送配置
+const {token} = hamibot.env;//载入信息推送配置
 const {应用分身} = hamibot.env;//载入是否有QQ应用分身
 const {qunmingcheng} = hamibot.env;//载入要发送的群名称
 const {phonelock} = hamibot.env;//载入密码方式
 const {mima} = hamibot.env;//读取配置中的密码
 log("配置加载成功")
 function sendEmail(email,etitle,emsg){
-  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=你的邮箱&Password=请填写你自己的SMTP码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
+  http.get("https://api.dzzui.com/api/mail?Host=smtp.163.com&Username=请在这里配置你的邮箱&Password=请在这里配置你邮箱的SMTP码&Port=465&SMTPSecure=ssl&addAddress="+email+"&title="+etitle+"&text="+emsg, {}, function(res, err) {
     if (err) {
       console.error("反馈邮件发送失败");
       return;
     }
   });
+};
+function tuisong(token,etitle,content){
+  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+    if (err) {
+      console.error("微信公众号推送失败");
+      return;
+		}
+	});
 }
 log("邮件发送模块加载成功")
 device.wakeUpIfNeeded()
@@ -74,12 +83,10 @@ switch (phonelock) {
     log("未锁定，开始执行正常流程。");
     break;
 }
-toast("2022年，新年快乐！作者在这里给大家拜年啦！")
-sleep(100)
-toast("您的当前版本为：A09")
+toast("您的当前版本为：A10")
 sleep(100)
 toast("欢迎加入脚本交流群：772442302，密码：咸鱼")
-log("2022年，新年快乐！当前版本为：", Banben, "欢迎加入脚本交流群：772442302，密码：咸鱼")
+log("当前版本为：", Banben, "欢迎加入脚本交流群：772442302，密码：咸鱼")
 // 启动 米游社
 var name = getPackageName('米游社'); // 返回 com.hamibot.hamibot
 launch(name);
@@ -92,6 +99,7 @@ if(id("mHomeChannelSetting").exists()){
 if(id("mUpgradeDialogOk").exists()){
   log("检测更新弹窗");
   sendEmail(email,"ERROR-米游社需要更新","检测到更新弹窗的出现，请您及时更新米游社，脚本已停止运行。");
+  tuisong(token,"ERROR-米游社需要更新","检测到更新弹窗的出现，请您及时更新米游社，脚本已停止运行。");
   home();
   log("邮件发送完成，停止脚本运行");
   exit()
@@ -120,6 +128,7 @@ if(id("mHomeChannelSetting").exists()){
 }else{
   log("警告未正常开启米游社软件，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   sendEmail(email,"错误，请联系开发者","未正常开启米游社软件，请确认是否安装米游社等。")
+  tuisong(token,"错误，请联系开发者","未正常开启米游社软件，请确认是否安装米游社等。")
   toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
   exit()
 }
@@ -177,7 +186,7 @@ if(id("ivTitleName").text("发送给").exists()){
   log("检测到搜索模块,正常运行")
 }else{
   log("警告未检测到分享页面关闭按钮，请自行查看是否分享成功，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-  var 未检测到分享页面关闭按钮 = "未检测到分享页面关闭按钮"
+  var 未检测到分享页面关闭按钮 = true
 }
 if(id("et_search_keyword").exists()){
   id("et_search_keyword").findOne().click();
@@ -306,17 +315,19 @@ while(!click(900,2222));
 log("检查任务是否完成")
 sleep(5000)
 if(id("coinContentTv").className("android.widget.TextView").text("已完成今日任务").exists()){
-	sendEmail(email,"米游社自动获取米游币回执","您已完成日常活动的所有米游币的获取")
-  if (未检测到分享页面关闭按钮 = "未检测到分享页面关闭按钮"){
-    sendEmail(email,"您已成功分享","检测模块存在bug，制作员正在加紧修复中。")
+	sendEmail(email,"米游社自动获取米游币回执","您已完成日常活动的所有米游币的获取，欢迎加入q群：772442302")
+  tuisong(token,"米游社自动获取米游币回执","您已完成日常活动的所有米游币的获取，欢迎加入q群：772442302")
+  if (未检测到分享页面关闭按钮 = false){
+    log("检测模块发生bug")
   }
 }else{
-  sendEmail(email,"出现未知错误","警告发生未知错误,米游币未完全获取，请检测是否勾选全部板块。若已勾选全部板块，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
-	log("上述流程出现未知错误，请检测是否开启权限等，并将日志发送到开发者：yiwenluohua@163.com")
-  if (未检测到分享页面关闭按钮 = "未检测到分享页面关闭按钮"){
-    sendEmail(email,"您未成功分享","因为您未成功分享引起的异常，请手动分享")
+  sendEmail(email,"出现未知错误","警告发生未知错误,米游币未完全获取，请检测是否勾选全部板块。若已勾选全部板块，请加入q群：772442302询问群主")
+	tuisong(token,"出现未知错误","警告发生未知错误,米游币未完全获取，请检测是否勾选全部板块。若已勾选全部板块，请加入q群：772442302询问群主")
+  log("上述流程出现未知错误，请检测是否开启权限等，请加入q群：772442302询问群主")
+  if (未检测到分享页面关闭按钮 = true){
+    sendEmail(email,"您未成功分享","因为您未成功分享引起的异常，请手动分享，欢迎加入q群：772442302")
+    tuisong(token,"您未成功分享","因为您未成功分享引起的异常，请手动分享，欢迎加入q群：772442302")
   }
-  exit();
 }
 while(!click(20,2222));
 log("返回米游社主页面")
@@ -324,7 +335,7 @@ home();
 sleep(2000);
 launch('com.android.bbk.lockscreen3');
 exit()
-——————————————————————以下为配置文件————————————————————
+——————————————————————————————配置————————————————————————————————
 [
   {
     "label": "解锁手势",
@@ -345,7 +356,7 @@ exit()
     "validation": "required"
   },
   {
-    "label": "屏幕锁定方式",
+    "label": "屏幕锁定方式，无锁的锁屏密码随便填就好了",
     "type": "select",
     "name": "phonelock",
     "options": {
@@ -355,9 +366,8 @@ exit()
     "validation": "required"
   },
   {
-    "label": "锁屏密码",
-    "name": "mima",
-    "validation": "required"
+    "label": "锁屏密码，仅支持数字锁屏",
+    "name": "mima"
   },
   {
     "label": "要转发的人或群的名称",
@@ -367,7 +377,12 @@ exit()
   {
     "label": "邮箱",
     "name": "email",
-    "validation": "required"
+    "Help": "不用就写1111就好"
+  },
+  {
+    "label": "token",
+    "name": "token",
+    "Help": "不用就写1111就好"
   },
   {
     "label": "QQ是否有应用分身",
