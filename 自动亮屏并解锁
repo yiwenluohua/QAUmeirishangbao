@@ -1,0 +1,118 @@
+auto.waitFor();
+const {slide_time} = hamibot.env;//载入滑屏时间
+const {gest} = hamibot.env;//载入开屏方式
+const {phonelock} = hamibot.env;//载入密码方式
+const {mima} = hamibot.env;//读取配置中的密码
+device.wakeUpIfNeeded()
+sleep(3000)
+var dwc = device.width/2;
+var dhc = device.height/2;
+var dw = device.width;
+var dh = device.height;
+var a = Number(slide_time)
+var No = "no", Up = "up", Down = "down", Right = "right", Left = "left";
+switch (gest) {
+  case No : 
+    log("无需上滑解锁");
+    break;
+  case Up :
+    swipe(570,1799,580,777,a)
+    log("上滑解锁成功");
+    sleep(1000);
+    break;
+  case Down :
+    swipe(500,777,500,1799,a);
+    log("下滑解锁成功");
+    sleep(1000);
+    break;
+  case Right :
+    swipe(0,700,1050,700,a);
+    log("右滑解锁成功");
+    sleep(1000);
+    break;
+  case Left :
+    swipe(1050,700,0,700,a);
+    log("左滑解锁成功");
+    sleep(1000);
+    break;
+}
+var A = "a", B = "b", C = "c", D = "d"
+switch (phonelock) {
+  case A :
+    var str = mima.toString();
+    var arr = str.split("");//将密码转为数组
+    for(var x = 0 ; x < arr.length ; x = x + 1){
+      desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
+      var c = x + 1
+      log("输入第", c ,"位密码中，请稍后……")
+      sleep(100);
+    };
+    sleep(1000);
+    break;
+  case B :
+    var arr = mima.split("-")
+    var pwd = []
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        var dot = []
+        dot[0] = x
+        dot[1] = y
+        pwd.push(dot)
+    }//解析坐标构造解锁坐标数组
+    sleep(800)
+    gesture(1500, pwd)
+    sleep(1000);
+    break;
+  case C :
+    var arr = mima.split("-")
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        press(x, y, 200)
+    }//解析坐标构造解锁坐标数组,并依次点击。
+    sleep(1000);
+    break;
+  case D :
+    log("未锁定，开始执行正常流程。");
+    break;
+}
+——————————————————以下为配置文件————————————————————
+[
+  {
+    "label": "解锁手势",
+    "type": "select",
+    "name": "gest",
+    "options": {
+      "no": "无",
+      "up": "上滑",
+      "down": "下滑",
+      "left": "左滑",
+      "right": "右滑"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "解锁延时",
+    "name": "slide_time",
+    "validation": "required"
+  },
+  {
+    "label": "屏幕锁定方式，无锁的锁屏密码随便填就好了",
+    "type": "select",
+    "name": "phonelock",
+    "options": {
+      "a": "数字锁",
+      "b": "图形锁",
+      "c": "混合锁",
+      "d": "无锁"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "锁屏密码或解锁坐标",
+    "name": "mima"
+  }
+]
