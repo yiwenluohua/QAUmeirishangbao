@@ -1,0 +1,46 @@
+//该代码autojs、autojs.Pro、hamibot通用
+auto.waitFor();
+/** 前台服务保活 */
+let KeepAliveService = {
+  /** 开启 */
+  start: function (idStr, nameStr) {
+    try {
+      idStr = idStr || "";
+      let channel_id = idStr + ".foreground";
+      let channel_name = nameStr + " 前台服务通知";
+
+      let content_title = nameStr + " 正在运行中";
+      let content_text = "请勿手动移除该通知";
+
+      let ticker = nameStr + "已启动";
+
+      let manager = context.getSystemService(android.app.Service.NOTIFICATION_SERVICE);
+      let notification;
+      let icon = context.getResources().getIdentifier("ic_3d_rotation_black_48dp", "drawable", context.getPackageName());
+      if (device.sdkInt >= 26) {
+        let channel = new android.app.NotificationChannel(channel_id, channel_name, android.app.NotificationManager.IMPORTANCE_DEFAULT);
+        channel.enableLights(true);
+        channel.setLightColor(0xff0000);
+        channel.setShowBadge(false);
+        manager.createNotificationChannel(channel);
+        notification = new android.app.Notification.Builder(context, channel_id).setContentTitle(content_title).setContentText(content_text).setWhen(new Date().getTime()).setSmallIcon(icon).setTicker(ticker).setOngoing(true).build();
+      } else {
+        notification = new android.app.Notification.Builder(context).setContentTitle(content_title).setContentText(content_text).setWhen(new Date().getTime()).setSmallIcon(icon).setTicker(ticker).build();
+      }
+      manager.notify(1, notification);
+    } catch (error) {
+      console.warn("前台保活服务启动失败:" + error);
+      console.warn("保活服务启动失败,不影响辅助的正常运行,继续挂机即可.");
+    }
+  },
+  /** 停止 */
+  stop: function () {  
+    let manager = context.getSystemService(android.app.Service.NOTIFICATION_SERVICE);
+    manager.cancelAll();
+  },
+};
+KeepAliveService.start("这里不要填","米游社自动获取米游币脚本");
+setTimeout(() => {
+  KeepAliveService.stop();
+  console.log("移除 前台服务");
+}, 5000);
