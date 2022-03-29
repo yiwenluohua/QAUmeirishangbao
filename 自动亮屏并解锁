@@ -1,16 +1,22 @@
-auto.waitFor();
-const {slide_time} = hamibot.env;//载入滑屏时间
-const {gest} = hamibot.env;//载入开屏方式
-const {phonelock} = hamibot.env;//载入密码方式
-const {mima} = hamibot.env;//读取配置中的密码
-device.wakeUpIfNeeded()
-sleep(3000)
+var Banben = "A12"
 var dwc = device.width/2;
 var dhc = device.height/2;
 var dw = device.width;
 var dh = device.height;
+//加载屏幕相关参数
+setScreenMetrics(1080, 2340);//设定初始屏幕比例
+const {slide_time} = hamibot.env;//载入滑屏时间
+const {gest} = hamibot.env;//载入开屏方式
+const {huaping} = hamibot.env;//载入自定义开屏选项
+const {token} = hamibot.env;//载入信息推送配置
+const {分享方式} = hamibot.env;//载入分享方式的选择问题
+const {qunmingcheng} = hamibot.env;//载入要发送的群名称
+const {phonelock} = hamibot.env;//载入密码方式
+const {mima} = hamibot.env;//读取配置中密码
+log("配置加载成功")
+sleep(1000)
 var a = Number(slide_time)
-var No = "no", Up = "up", Down = "down", Right = "right", Left = "left";
+var No = "no", Up = "up", Down = "down", Right = "right", Left = "left", Ziyou = "ziyou";
 switch (gest) {
   case No : 
     log("无需上滑解锁");
@@ -35,7 +41,24 @@ switch (gest) {
     log("左滑解锁成功");
     sleep(1000);
     break;
+  case Ziyou :
+    var arr = huaping.split("-")
+    var pwd = []
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        var dot = []
+        dot[0] = x
+        dot[1] = y
+        pwd.push(dot)
+    }//解析坐标构造解锁坐标数组
+    sleep(800)
+    gesture(1700, pwd)
+    sleep(1000);
+    break;
 }
+//唤醒设备后上滑进入解锁界面
 var A = "a", B = "b", C = "c", D = "d"
 switch (phonelock) {
   case A :
@@ -47,7 +70,7 @@ switch (phonelock) {
       log("输入第", c ,"位密码中，请稍后……")
       sleep(100);
     };
-    sleep(1000);
+    sleep(200);
     break;
   case B :
     var arr = mima.split("-")
@@ -62,7 +85,7 @@ switch (phonelock) {
         pwd.push(dot)
     }//解析坐标构造解锁坐标数组
     sleep(800)
-    gesture(1500, pwd)
+    gesture(1700, pwd)
     sleep(1000);
     break;
   case C :
@@ -79,7 +102,8 @@ switch (phonelock) {
     log("未锁定，开始执行正常流程。");
     break;
 }
-——————————————————以下为配置文件————————————————————
+sleep(1000)
+//——————————————————————————————————配置文件——————————————————————————————————//
 [
   {
     "label": "解锁手势",
@@ -90,9 +114,15 @@ switch (phonelock) {
       "up": "上滑",
       "down": "下滑",
       "left": "左滑",
-      "right": "右滑"
+      "right": "右滑",
+      "ziyou": "自由解锁"
     },
     "validation": "required"
+  },
+  {
+    "label": "划屏坐标",
+    "name": "huaping",
+    "help": "自定义开屏请按首页方法填写坐标。坐标请按照【X,Y-X,Y……】的方法填写。注意使用的是英文符号。"
   },
   {
     "label": "解锁延时",
@@ -100,8 +130,9 @@ switch (phonelock) {
     "validation": "required"
   },
   {
-    "label": "屏幕锁定方式，无锁的锁屏密码随便填就好了",
+    "label": "屏幕锁定方式",
     "type": "select",
+    "help": "注意，选择无锁的话下面的随便填",
     "name": "phonelock",
     "options": {
       "a": "数字锁",
@@ -112,7 +143,8 @@ switch (phonelock) {
     "validation": "required"
   },
   {
-    "label": "锁屏密码或解锁坐标",
-    "name": "mima"
+    "label": "密码或锁屏坐标",
+    "name": "mima",
+    "help": "混合锁请按首页方法填写坐标。坐标请按照【X,Y-X,Y……】的方法填写。注意使用的是英文符号。"
   }
 ]
