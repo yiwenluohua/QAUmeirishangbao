@@ -1,0 +1,522 @@
+auto.waitFor();
+log("开始运行")
+device.wakeUpIfNeeded()
+/** 前台服务保活 */
+let KeepAliveService = {
+  /** 开启 */
+  start: function (idStr, nameStr) {
+    try {
+      idStr = idStr || "";
+      let channel_id = idStr + ".foreground";
+      let channel_name = nameStr + " 前台服务通知";
+      let content_title = nameStr + " 正在运行中";
+      let content_text = "请勿手动移除该通知";
+
+      let ticker = nameStr + "已启动";
+
+      let manager = context.getSystemService(android.app.Service.NOTIFICATION_SERVICE);
+      let notification;
+      let icon = context.getResources().getIdentifier("ic_3d_rotation_black_48dp", "drawable", context.getPackageName());
+      if (device.sdkInt >= 26) {
+        let channel = new android.app.NotificationChannel(channel_id, channel_name, android.app.NotificationManager.IMPORTANCE_DEFAULT);
+        channel.enableLights(true);
+        channel.setLightColor(0xff0000);
+        channel.setShowBadge(false);
+        manager.createNotificationChannel(channel);
+        notification = new android.app.Notification.Builder(context, channel_id).setContentTitle(content_title).setContentText(content_text).setWhen(new Date().getTime()).setSmallIcon(icon).setTicker(ticker).setOngoing(true).build();
+      } else {
+        notification = new android.app.Notification.Builder(context).setContentTitle(content_title).setContentText(content_text).setWhen(new Date().getTime()).setSmallIcon(icon).setTicker(ticker).build();
+      }
+      manager.notify(1, notification);
+    } catch (error) {
+      console.warn("前台保活服务启动失败:" + error);
+      console.warn("保活服务启动失败,不影响辅助的正常运行,继续挂机即可.");
+    }
+  },
+  /** 停止 */
+  stop: function () { 
+    let manager = context.getSystemService(android.app.Service.NOTIFICATION_SERVICE);
+    manager.cancelAll();
+  },
+};
+log("前台服务加载完成")
+KeepAliveService.start("这里不要填","米游社自动获取米游币脚本");
+log("成功开启前台服务模式")
+setTimeout(() => {
+  KeepAliveService.stop();
+  console.log("移除 前台服务");
+}, 500000);
+log("前台服务模式将于500秒后结束，请保证10分钟内无其他脚本运行。")
+var Banben = "A12"
+var dwc = device.width/2;
+var dhc = device.height/2;
+var dw = device.width;
+var dh = device.height;
+//加载屏幕相关参数
+setScreenMetrics(1080, 2340);//设定初始屏幕比例
+const {slide_time} = hamibot.env;//载入滑屏时间
+const {gest} = hamibot.env;//载入开屏方式
+const {huaping} = hamibot.env;//载入自定义开屏选项
+const {token} = hamibot.env;//载入信息推送配置
+const {分享方式} = hamibot.env;//载入分享方式的选择问题
+const {qunmingcheng} = hamibot.env;//载入要发送的群名称
+const {phonelock} = hamibot.env;//载入密码方式
+const {mima} = hamibot.env;//读取配置中密码
+function tuisong(token,etitle,content){
+  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+    if (err) {
+      console.error("微信公众号推送失败");
+      return;
+		}
+	});
+}
+log("微信推送模块加载成功")
+log("配置加载成功")
+sleep(1000)
+var a = Number(slide_time)
+var No = "no", Up = "up", Down = "down", Right = "right", Left = "left", Ziyou = "ziyou";
+switch (gest) {
+  case No : 
+    log("无需上滑解锁");
+    break;
+  case Up :
+    swipe(570,1799,580,777,a)
+    log("上滑解锁成功");
+    sleep(1000);
+    break;
+  case Down :
+    swipe(500,777,500,1799,a);
+    log("下滑解锁成功");
+    sleep(1000);
+    break;
+  case Right :
+    swipe(0,700,1050,700,a);
+    log("右滑解锁成功");
+    sleep(1000);
+    break;
+  case Left :
+    swipe(1050,700,0,700,a);
+    log("左滑解锁成功");
+    sleep(1000);
+    break;
+  case Ziyou :
+    var arr = huaping.split("-")
+    var pwd = []
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        var dot = []
+        dot[0] = x
+        dot[1] = y
+        pwd.push(dot)
+    }//解析坐标构造解锁坐标数组
+    sleep(800)
+    gesture(1700, pwd)
+    sleep(1000);
+    break;
+}
+//唤醒设备后上滑进入解锁界面
+var A = "a", B = "b", C = "c", D = "d"
+switch (phonelock) {
+  case A :
+    var str = mima.toString();
+    var arr = str.split("");//将密码转为数组
+    for(var x = 0 ; x < arr.length ; x = x + 1){
+      desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
+      var c = x + 1
+      log("输入第", c ,"位密码中，请稍后……")
+      sleep(100);
+    };
+    sleep(200);
+    break;
+  case B :
+    var arr = mima.split("-")
+    var pwd = []
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        var dot = []
+        dot[0] = x
+        dot[1] = y
+        pwd.push(dot)
+    }//解析坐标构造解锁坐标数组
+    sleep(800)
+    gesture(1700, pwd)
+    sleep(1000);
+    break;
+  case C :
+    var arr = mima.split("-")
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        press(x, y, 200)
+    }//解析坐标构造解锁坐标数组,并依次点击。
+    sleep(1000);
+    break;
+  case D :
+    log("未锁定，开始执行正常流程。");
+    break;
+}
+sleep(1000)
+var name1 = getPackageName('米游社'); // 返回米游社应用包名
+sleep(100)
+launch(name1);
+toast("您的当前版本为：不稳定测试版")
+sleep(100)
+toast("欢迎加入脚本交流群：772442302，密码：咸鱼")
+log("当前版本为：", Banben, "欢迎加入脚本交流群：772442302，密码：咸鱼")
+sleep(2000)
+var name1 = getPackageName('米游社'); // 返回米游社应用包名
+sleep(100)
+launch(name1);
+log("米游社正常开启")
+//暂停4~5秒，过开屏动画
+sleep(7000);
+if(id("mUpgradeDialogOk").exists()){
+  log("检测更新弹窗");
+  tuisong(token,"ERROR-米游社需要更新","检测到更新弹窗的出现，请您及时更新米游社，脚本已停止运行。");
+  home();
+  log("邮件发送完成，停止脚本运行");
+  exit()
+}
+sleep(4000)
+if(id("tv_i_know").exists()){
+  log("检测到青少年模式弹窗");
+  id("tv_i_know").findOne().click();
+  log("青少年模式已关闭");
+}
+sleep(1000);
+if (id("homepageTv").exists()){
+  while(!click(20,2222));
+  log("检测到位于“我的”页面，开始执行返回操作")
+}
+if (id("mTabLayoutTabTvTitle").className("android.widget.TextView").text("发现").exists()){
+  while(!click(20,2222));
+  log("检测到位于“动态”页面，开始执行返回操作")
+}
+if (id("msgTv").exists()){
+  while(!click(20,2222));
+  log("检测到位于“消息”页面，开始执行返回操作")
+}
+if(id("mHomeChannelSetting").exists()){
+  log("检测到米游社主页控件，开始执行后续步骤")
+  var jieguo = "测试成功";
+}else{
+  log("警告未正常开启米游社软件，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  tuisong(token,"错误，请联系开发者","未正常开启米游社软件，请确认是否安装米游社等。")
+  toast("警告发生未知错误，请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+  exit()
+}
+for(var i = 1; i < 7; i++){
+	gesture(300, [dw/8, dhc], [dw/8*7, dhc]);
+	log("正在进行第",i,"次切换模块")
+	sleep(2000);
+}
+sleep(5000);
+while(!click('进入讨论区',0));
+log("执行进入讨论区的操作")
+sleep(3000);
+click(3,1230);
+log("进入第一个帖子")
+sleep(2000);
+if(id("mPostDetailActionBarLikeView").exists()){
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("点赞")
+	sleep(4000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("取消点赞")
+}else{
+	log("检测到被删除的帖子，开始寻找未被删除的帖子")
+  do{
+	    back();
+	    sleep(2000)
+	    var x = 1
+	    log("正在寻找第",x,"个帖子")
+    	for(var xiahua = 1; xiahua < 3; xiahua++){
+	    	swipe(20,1600,20,600,500);
+        sleep(200)
+      }
+    	x = x + 1
+	    click(3,1230);
+			sleep(2000);
+    	if(x > 5){
+        break;
+      };
+	} while(!id("mPostDetailActionBarLikeView").exists());
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("点赞")
+	sleep(4000);
+	id("mPostDetailActionBarLikeView").findOne().click();
+	log("取消点赞")
+}
+sleep(2000);
+id("mPostDetailActionBarIvMore").findOne().click();
+log("开始分享")
+sleep(2000);
+var QQ1 = "qq1", QQ2 = "qq2", WX1 = "wx1", WX2 = "wx2", TIM = "tim";
+switch (分享方式) {
+  case 	QQ1 :
+    while(!click("QQ",0));
+    sleep(2000);
+    log("进入第一个qq")
+    sleep(5000);
+    if(id("ivTitleName").text("发送给").exists()){
+      log("检测到搜索模块,正常运行")
+    }else{
+      log("警告未检测到分享页面关闭按钮，请自行查看是否分享成功，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+      var 未检测到分享页面关闭按钮 = true;
+    }
+    if(id("et_search_keyword").exists()){
+      id("et_search_keyword").findOne().click();
+      log("点击搜索栏")
+    }else if(id("ik5").exists()){
+      id("ik5").findOne().click();
+      log("点击搜索栏");
+    }else{
+      log("请联系作者修改脚本。")
+    }
+    sleep(2000);
+    setText(0,qunmingcheng);
+    log("填写提前设置好的文本")
+    sleep(2000);
+		className("android.widget.RelativeLayout").clickable(true).depth(8).findOne().click();
+		log("点击搜索结果，警告，请给需要分享的群或用户起一个没有重复的名字，不然会发生未知错误")
+		id("dialogRightBtn").waitFor();
+		id("dialogRightBtn").findOne().click();
+		log("点击右侧按钮")
+		sleep(2000);
+		id("dialogLeftBtn").waitFor();
+		id("dialogLeftBtn").findOne().click();
+		log("点击左侧按钮")
+		sleep(2000);
+    break;
+  case QQ2 :
+    while(!click("QQ",0));
+    sleep(2000);
+    while(!click("QQ",0));
+    log("进入第一个qq")
+    sleep(5000);
+    if(id("ivTitleName").text("发送给").exists()){
+      log("检测到搜索模块,正常运行")
+    }else{
+      log("警告未检测到分享页面关闭按钮，请自行查看是否分享成功，开始发送错误邮件。请将hamibot中的日志文件截图发送给开发者：yiwenluohua@163.com")
+      var 未检测到分享页面关闭按钮 = true;
+    }
+    if(id("et_search_keyword").exists()){
+      id("et_search_keyword").findOne().click();
+      log("点击搜索栏")
+    }else if(id("ik5").exists()){
+      id("ik5").findOne().click();
+      log("点击搜索栏");
+    }else{
+      log("请联系作者修改脚本。")
+    }
+    sleep(2000);
+    setText(0,qunmingcheng);
+    log("填写提前设置好的文本")
+    sleep(2000);
+		className("android.widget.RelativeLayout").clickable(true).depth(8).findOne().click();
+		log("点击搜索结果，警告，请给需要分享的群或用户起一个没有重复的名字，不然会发生未知错误")
+		id("dialogRightBtn").waitFor();
+		id("dialogRightBtn").findOne().click();
+		log("点击右侧按钮")
+		sleep(2000);
+		id("dialogLeftBtn").waitFor();
+		id("dialogLeftBtn").findOne().click();
+		log("点击左侧按钮")
+		sleep(2000);
+    break;
+  case WX1 :
+    while(!click("微信",0));
+    id("text1").findOne().parent().waitFor();
+    if(className("android.widget.ImageView").depth(11).findOne().parent().exists()){
+      className("android.widget.ImageView").depth(11).findOne().parent().click();
+      setText(0,qunmingcheng);
+    }else if(id("d7d").exists()){
+      id("d7d").findOne().click();
+      setText(0,qunmingcheng);
+    }else{
+      back();
+      break;
+    }
+    id("hhi").findOne().children().forEach(child => {
+      var target = child.findOne(className("android.widget.LinearLayout").depth(14));
+      target.click();
+    });
+    id("ffp").waitFor();
+    id("ffp").findOne().click();
+    id("ffb").waitFor();
+    id("ffb").findOne().click();
+    break;
+  case WX2 :
+    while(!click("微信",0));
+    sleep(2000);
+    while(!click("微信",0));
+    id("text1").findOne().parent().waitFor();
+    if(className("android.widget.ImageView").depth(11).findOne().parent().exists()){
+      className("android.widget.ImageView").depth(11).findOne().parent().click();
+      setText(0,qunmingcheng);
+    }else if(id("d7d").exists()){
+      id("d7d").findOne().click();
+      setText(0,qunmingcheng);
+    }else{
+      back();
+      break;
+    }
+    id("hhi").findOne().children().forEach(child => {
+      var target = child.findOne(className("android.widget.LinearLayout").depth(14));
+      target.click();
+    });
+    id("ffp").waitFor();
+    id("ffp").findOne().click();
+    id("ffb").waitFor();
+    id("ffb").findOne().click();
+    break;
+  case TIM :
+    while(!click("QQ",0));
+    sleep(2000);
+    while(!click("TIM",0));
+    sleep(3000);
+    if(id("et_search_keyword").exists()){
+      id("et_search_keyword").findOne().click();
+      log("点击搜索栏")
+    }else if(id("kag").exists()){
+      id("kag").findOne().click();
+      log("点击搜索栏");
+    }else{
+      log("请联系作者修改脚本。")
+    }
+    className("android.widget.RelativeLayout").depth(10).findOne().click();
+    id("dialogRightBtn").waitFor();
+    id("dialogRightBtn").findOne().click();
+    id("dialogLeftBtn").waitFor();
+    id("dialogLeftBtn").findOne().click();
+    break;
+}
+back();
+for(var i = 0; i < 7; i = i + 1){
+  var z = i + 1
+  var c = i + 2
+  sleep(500)
+  for(var xiahua = 0; xiahua < 3; xiahua++){
+  	swipe(20,1600,20,600,500);
+    sleep(200)
+  }
+	log("下滑",z,"次")
+	sleep(3000);
+	click(3,1230);
+	log("进入第",c,"个帖子")
+	sleep(2000);
+  if(id("mPostDetailActionBarLikeView").exists()){
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(2000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+  }else{
+		log("检测到被删除的帖子，开始寻找未被删除的帖子")
+	  do{
+		  back();
+		  sleep(2000)
+	    var x = 1
+	    log("正在寻找第",x,"个帖子")
+      for(var xiahua = 0; xiahua < 3; xiahua++){
+				swipe(20,1600,20,600,500);
+      	sleep(200)
+      }
+		  click(3,1230);
+     	x = x + 1
+			sleep(2000);
+      if(x > 5){
+        break;
+      }
+	  } while(!id("mPostDetailActionBarLikeView").exists());
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(4000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+  }
+  sleep(2000);
+	back();
+}
+while(!id("mHomeChannelSetting").exists()){
+  log("检测是否回到主界面")
+  back();
+  log("执行一次返回操作")
+  sleep(1000);
+}
+sleep(1000);
+for(var i = 0;i < 5;i = i + 1){
+  var x = i + 2
+  var z = i + 9
+  gesture(300, [dw/8*7, dhc], [dw/8, dhc]);
+  log("进入第",x,"个模块")
+  sleep(4000);
+  while(!click('进入讨论区'));
+	log("执行进入讨论区的操作")
+	sleep(3000);
+  this.jianchadian2
+	click(3,1230);
+	log("进入第",z,"个帖子")
+	sleep(2000);
+  if(id("mPostDetailActionBarLikeView").exists()){
+    id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(2000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+  }else{
+		log("检测到被删除的帖子，开始寻找未被删除的帖子")
+  	do{
+	    back();
+	    sleep(2000)
+	    var x = 1
+	    log("正在寻找第",x,"个帖子")
+      for(var xiahua = 0; xiahua < 3; xiahua++){
+	    	swipe(20,1600,20,600,500);
+        sleep(200);
+      }
+	    click(3,1230);
+			sleep(2000);
+	  }while(!id("mPostDetailActionBarLikeView").exists());
+	  id("mPostDetailActionBarLikeView").findOne().click();
+		log("点赞")
+		sleep(4000);
+		id("mPostDetailActionBarLikeView").findOne().click();
+		log("取消点赞")
+		sleep(2000);
+  }
+	sleep(1000);
+	while(!id("mHomeChannelSetting").exists()){
+	  log("检测是否回到主界面")
+	  back();
+	  log("执行一次返回操作")
+	  sleep(1000);
+	}
+	sleep(1000);
+}
+while(!click(900,2222));
+log("检查任务是否完成")
+sleep(5000)
+if(id("coinContentTv").className("android.widget.TextView").text("已完成今日任务").exists()){
+  tuisong(token,"米游社自动获取米游币回执","您已完成日常活动的所有米游币的获取，欢迎加入q群：772442302")
+  if (未检测到分享页面关闭按钮 = false){
+    log("检测模块发生bug")
+  }
+}else{
+	tuisong(token,"出现未知错误","警告发生未知错误,米游币未完全获取，请检测是否勾选全部板块。若已勾选全部板块，请加入q群：772442302询问群主")
+  log("上述流程出现未知错误，请检测是否开启权限等，请加入q群：772442302询问群主")
+  if (未检测到分享页面关闭按钮 = true){
+    tuisong(token,"您未成功分享","因为您未成功分享引起的异常，请手动分享，欢迎加入q群：772442302")
+  }
+}
+while(!click(20,2222));
+log("返回米游社主页面")
+home();
+sleep(2000);
+launch('com.android.bbk.lockscreen3');
+exit()
