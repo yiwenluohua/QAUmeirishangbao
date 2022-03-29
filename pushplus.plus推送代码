@@ -1,0 +1,35 @@
+/**推送函数打包*/
+function tuisong(token,etitle,content){
+  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+    if (err) {
+      console.error("微信公众号推送失败");
+      return;
+		}
+	});
+}
+/**推送代码*/
+tuisong(你的token,"标题","内容")
+/**举例：配置文件*/
+[
+  {
+    "label": "token",
+    "name": "token",
+    "Help": "不用瞎写就好。"
+  }
+]
+//如果有其他需要配置的文件，请只复制包括{}在内的内容，[]不要复制进去，如果将token配置信息放在中间，请在最后的大括号内加入英文字符下的括号:"},"
+/**举例：代码部分*/
+auto.waitFor();//开启无障碍权限，基本上hamibot的所有脚本都是这行开头的
+const {token} = hamibot.env;//载入信息推送配置
+…………//其他代码
+function tuisong(token,etitle,content){
+  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+    if (err) {
+      console.error("微信公众号推送失败");
+      return;
+		}
+	});
+}
+//插入打包好的推送函数。
+………//其他代码
+tuisong(token,"测试","测试内容：欢迎加入脚本交流群：772442302，密码：咸鱼")
