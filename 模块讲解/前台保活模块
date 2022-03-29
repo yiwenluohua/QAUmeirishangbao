@@ -1,4 +1,5 @@
 //该代码autojs、autojs.Pro、hamibot通用
+//使用方法：直接复制粘贴进去就好
 auto.waitFor();
 /** 前台服务保活 */
 let KeepAliveService = {
@@ -43,4 +44,4 @@ KeepAliveService.start("这里不要填","米游社自动获取米游币脚本")
 setTimeout(() => {
   KeepAliveService.stop();
   console.log("移除 前台服务");
-}, 5000);
+}, 500000);//时间在这里改，现在是500秒后停止运行前台服务。
