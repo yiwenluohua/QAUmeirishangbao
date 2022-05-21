@@ -57,7 +57,6 @@ setTimeout(() => {
   console.log("移除 前台服务");
 }, 500000);
 log("前台服务模式将于500秒后结束，请保证10分钟内无其他脚本运行。")
-device.wakeUpIfNeeded()
 var dwc = device.width/2;
 var dhc = device.height/2;
 var dw = device.width;
@@ -69,121 +68,14 @@ const {huaping} = hamibot.env;//载入自定义开屏选项
 const {token} = hamibot.env;//载入信息推送配置
 const {lock} = hamibot.env;//载入密码方式
 const {mima} = hamibot.env;//读取配置中密码
-function tuisong(token,etitle,content){
-  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
-    if (err) {
-      console.error("微信公众号推送失败");
-      return;
-		}
-	});
-}
-function show(){
-    var now = new Date();
-    var year = now.getFullYear(); //得到年份
-    var month = now.getMonth()+1;//得到月份
-    var date = now.getDate();//得到日期
-    var hour= now.getHours();//得到小时数
-    var minute= now.getMinutes();//得到分钟数
-    var second= now.getSeconds();//得到秒数
-    var shijian = year + "年" + month + "月" + date + "日" + hour + "时" + minute + "分" + second + "秒"
-    return shijian
-}
-function wenbendianji(wenbenneirong){
-  var b = text(wenbenneirong).findOne().bounds();
-  log("点击", wenbenneirong);
-  click(b.centerX(), b.centerY());
-}
+const {huizhi} = hamibot.env;//读取配置中推送回执延时（点击提交之后，到出现“提交成功”或“今日您已经上报，无需重复上报”字样的时间）
+
 log(dw+"-"+dh)
 log("配置加载成功")
 sleep(1000)
-var a = Number(slide_time)
-var No = "no", Up = "up", Down = "down", Right = "right", Left = "left", Ziyou = "ziyou";
-switch (gest) {
-  case No : 
-    log("无需上滑解锁");
-    break;
-  case Up :
-    swipe(570,1799,580,777,a)
-    log("上滑解锁成功");
-    sleep(1000);
-    break;
-  case Down :
-    swipe(500,777,500,1799,a);
-    log("下滑解锁成功");
-    sleep(1000);
-    break;
-  case Right :
-    swipe(0,700,1050,700,a);
-    log("右滑解锁成功");
-    sleep(1000);
-    break;
-  case Left :
-    swipe(1050,700,0,700,a);
-    log("左滑解锁成功");
-    sleep(1000);
-    break;
-  case Ziyou :
-    var arr = huaping.split("-")
-    var pwd = []
-    for (var i = 0; i < arr.length; i++) {
-        var temp = arr[i].split(",")
-        var x = Number(temp[0])
-        var y = Number(temp[1])
-        var dot = []
-        dot[0] = x
-        dot[1] = y
-        pwd.push(dot)
-    }//解析坐标构造解锁坐标数组
-    sleep(800)
-    gesture(1700, pwd)
-    sleep(1000);
-    break;
-}//唤醒设备后上滑进入解锁界面
+liangping(slide_time,gest)
 sleep(100)
-var A = "a", B = "b", C = "c", D = "d"
-log(1)
-switch (lock) {
-  case A :
-    var str = mima.toString();
-    var arr = str.split("");//将密码转为数组
-    for(var x = 0 ; x < arr.length ; x = x + 1){
-      desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
-      var c = x + 1
-      log("输入第", c ,"位密码中，请稍后……")
-      sleep(100);
-    };
-    sleep(200);
-    break;
-  case B :
-    var arr = mima.split("-")
-    var pwd = []
-    for (var i = 0; i < arr.length; i++) {
-        var temp = arr[i].split(",")
-        var x = Number(temp[0])
-        var y = Number(temp[1])
-        var dot = []
-        dot[0] = x
-        dot[1] = y
-        pwd.push(dot)
-    }//解析坐标构造解锁坐标数组
-    sleep(800)
-    gesture(1700, pwd)
-    sleep(1000);
-    break;
-  case C :
-    var arr = mima.split("-")
-    for (var i = 0; i < arr.length; i++) {
-        var temp = arr[i].split(",")
-        var x = Number(temp[0])
-        var y = Number(temp[1])
-        press(x, y, 200)
-    }//解析坐标构造解锁坐标数组,并依次点击。
-    sleep(1000);
-    break;
-  case D :
-    log("未锁定，开始执行正常流程。");
-    break;
-}
+jiesuo(lock,mima)
 sleep(1000)
 toast("A04版本是最后依托于hamibot平台构建的版本，新版本【B01】将正式脱离hamibot平台")
 sleep(1000)
@@ -229,23 +121,13 @@ do {
 sleep(2000)
 log('进入青岛农业大学学工在线公众号')
 wenbendianji("信息上报")
-sleep(100)
-if(text("微信登录").findOne().bounds()){
-  className("android.widget.Button").clickable(true).depth(20).findOne().click()
-  sleep(100)
-  wenbendianji("允许")
-}
-sleep(1000)
+sleep(2000)
 if(className("android.view.View").text("其他登录方式").exists()){
   className("android.widget.Button").clickable(true).depth(20).findOne().click()
 }
-sleep(2000)
-if(className("android.widget.TextView").text("疫情防控").exists()){
-  log("一切正常")
-}else{
-  sleep(3000)
-  log("警告：出现异常点")
-}
+className("android.view.View").text("每日上报").waitFor()
+log('等待加载页面')
+threads.shutDownAll()
 log('等待加载页面')
 wenbendianji("每日上报")
 toast('每日上报');
@@ -257,29 +139,170 @@ for(var i = 0;i < 10 ; i++){
 }
 wenbendianji("本人承诺以上填报数据真实有效。（请打勾后提交数据）")
 wenbendianji("提 交")
+sleep(huizhi)
 //加入成功上报查找函数
 var endtime = "脚本结束运行时间为：" + show();
-if(text("提交成功").findOne().bounds()){
+if(className("android.widget.TextView").text("提交成功").exists()){
 	log(endtime);
   var aaa = starttime + endtime + "QAU每日上报助手已帮您完成平安上报";
   tuisong(token,"回执：成功上报", aaa);
-}else if(text("今日您已经上报，无需重复上报").findOne().bounds()){
+  log("回执：“成功上报”已发送")
+}else if(className("android.widget.TextView").text("今日您已经上报，无需重复上报").exists()){
   log(endtime);
   var aaa = starttime + endtime + "今日您已经上报，无需重复上报"
   tuisong(token,"回执：您已经上报", aaa);
+  log("回执：“您已经上报”已发送")
 }else{
   log(endtime);
   var aaa = starttime + endtime + "出现未知原因故障，请重试"
   tuisong(token,"错误回执", aaa);
+  log("回执：“出现未知原因故障，请重试”已发送")
 }
 log('填报已完成，结果请查看推送反馈')
 sleep(1000);
-home();
+for(var i = 1; i < 10; i++){
+  back();
+  sleep(200)
+}
 sleep(1000);
 launch('com.android.bbk.lockscreen3');
 log('脚本执行完毕')
 threads.shutDownAll()
 exit();
+/**
+ * 函数封装说明：
+ * 1、推送函数：tuisong(令牌,标题,正文内容)
+ * 2、当前时间获取函数：show()该函数返回为文本内容：xxxx年xx月xx日xx时xx分xx秒
+ * 3、文本点击函数：wenbendianji("文本内容")，查找文本并查找文本对应的XY值，通过点击文本坐标实现模拟点击效果。
+ * 4、亮屏函数：function liangping(亮屏延时,滑屏方式)
+ * 5、解锁函数：jiesuo(锁屏类型,密码)
+ * 
+*/
+function tuisong(token,etitle,content){
+  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+    if (err) {
+      console.error("微信公众号推送失败");
+      return;
+		}
+	});
+}
+function show(){
+    var now = new Date();
+    var year = now.getFullYear(); //得到年份
+    var month = now.getMonth()+1;//得到月份
+    var date = now.getDate();//得到日期
+    var hour= now.getHours();//得到小时数
+    var minute= now.getMinutes();//得到分钟数
+    var second= now.getSeconds();//得到秒数
+    var shijian = year + "年" + month + "月" + date + "日" + hour + "时" + minute + "分" + second + "秒"
+    return shijian
+}
+function wenbendianji(wenbenneirong){
+  var b = text(wenbenneirong).findOne().bounds();
+  log("点击", wenbenneirong);
+  click(b.centerX(), b.centerY());
+}
+
+function tuisong(token,etitle,content){
+    http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+      if (err) {
+        console.error("微信公众号推送失败");
+        return;
+        }
+    });
+}
+function liangping(slide_time,gest){
+    device.wakeUpIfNeeded()
+    sleep(1000)
+    var a = Number(slide_time)
+    var No = "no", Up = "up", Down = "down", Right = "right", Left = "left", Ziyou = "ziyou";
+    switch (gest) {
+        case No : 
+            log("无需上滑解锁");
+            break;
+        case Up :
+            swipe(500,2000,500,500,a)
+            log("上滑解锁成功");
+            sleep(1000);
+            break;
+        case Down :
+            swipe(500,500,500,2000,a);
+            log("下滑解锁成功");
+            sleep(1000);
+            break;
+        case Right :
+            swipe(0,700,1050,700,a);
+            log("右滑解锁成功");
+            sleep(1000);
+            break;
+        case Left :
+            swipe(1050,700,0,700,a);
+            log("左滑解锁成功");
+            sleep(1000);
+            break;
+        case Ziyou :
+            var arr = huaping.split("-")
+            var pwd = []
+            for (var i = 0; i < arr.length; i++) {
+                var temp = arr[i].split(",")
+                var x = Number(temp[0])
+                var y = Number(temp[1])
+                var dot = []
+                dot[0] = x
+                dot[1] = y
+                pwd.push(dot)
+            }//解析坐标构造解锁坐标数组
+            sleep(800)
+            gesture(1700, pwd)
+            sleep(1000);
+            break;
+    }
+}
+function jiesuo(phonelock,mima){
+    var A = "a", B = "b", C = "c", D = "d"
+    switch (phonelock) {
+        case A :
+          var str = mima.toString();
+          var arr = str.split("");//将密码转为数组
+          for(var x = 0 ; x < arr.length ; x = x + 1){
+            desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
+            var c = x + 1
+            log("输入第", c ,"位密码中，请稍后……")
+            sleep(100);
+          };
+          sleep(200);
+          break;
+        case B :
+          var arr = mima.split("-")
+          var pwd = []
+          for (var i = 0; i < arr.length; i++) {
+              var temp = arr[i].split(",")
+              var x = Number(temp[0])
+              var y = Number(temp[1])
+              var dot = []
+              dot[0] = x
+              dot[1] = y
+              pwd.push(dot)
+          }//解析坐标构造解锁坐标数组
+          sleep(800)
+          gesture(1700, pwd)
+          sleep(1000);
+          break;
+        case C :
+          var arr = mima.split("-")
+          for (var i = 0; i < arr.length; i++) {
+              var temp = arr[i].split(",")
+              var x = Number(temp[0])
+              var y = Number(temp[1])
+              press(x, y, 200)
+          }//解析坐标构造解锁坐标数组,并依次点击。
+          sleep(1000);
+          break;
+        case D :
+          log("未锁定，开始执行正常流程。");
+          break;
+    }
+}
 ------------------------------配置文件-------------------------------
 [
   {
