@@ -1,0 +1,332 @@
+auto.waitFor();
+threads.start(function(){
+    //在新线程执行的代码
+    while(true){
+        if(text("确定").findOne()){
+          wenbendianji("确定")
+        }else{
+          sleep(2000);
+        }
+    }
+});
+var starttime = "脚本开始运行时间为：" + show();
+log(starttime);
+/** 前台服务保活 */
+let KeepAliveService = {
+  /** 开启 */
+  start: function (idStr, nameStr) {
+    try {
+      idStr = idStr || "";
+      let channel_id = idStr + ".foreground";
+      let channel_name = nameStr + " 前台服务通知";
+      let content_title = nameStr + " 正在运行中";
+      let content_text = "请勿手动移除该通知";
+
+      let ticker = nameStr + "已启动";
+
+      let manager = context.getSystemService(android.app.Service.NOTIFICATION_SERVICE);
+      let notification;
+      let icon = context.getResources().getIdentifier("ic_3d_rotation_black_48dp", "drawable", context.getPackageName());
+      if (device.sdkInt >= 26) {
+        let channel = new android.app.NotificationChannel(channel_id, channel_name, android.app.NotificationManager.IMPORTANCE_DEFAULT);
+        channel.enableLights(true);
+        channel.setLightColor(0xff0000);
+        channel.setShowBadge(false);
+        manager.createNotificationChannel(channel);
+        notification = new android.app.Notification.Builder(context, channel_id).setContentTitle(content_title).setContentText(content_text).setWhen(new Date().getTime()).setSmallIcon(icon).setTicker(ticker).setOngoing(true).build();
+      } else {
+        notification = new android.app.Notification.Builder(context).setContentTitle(content_title).setContentText(content_text).setWhen(new Date().getTime()).setSmallIcon(icon).setTicker(ticker).build();
+      }
+      manager.notify(1, notification);
+    } catch (error) {
+      console.warn("前台保活服务启动失败:" + error);
+      console.warn("保活服务启动失败,不影响辅助的正常运行,继续挂机即可.");
+    }
+  },
+  /** 停止 */
+  stop: function () { 
+    let manager = context.getSystemService(android.app.Service.NOTIFICATION_SERVICE);
+    manager.cancelAll();
+  },
+};
+log("前台服务加载完成")
+KeepAliveService.start("这里不要填","QAU自动上报脚本");
+log("成功开启前台服务模式")
+setTimeout(() => {
+  KeepAliveService.stop();
+  console.log("移除 前台服务");
+}, 500000);
+log("前台服务模式将于500秒后结束，请保证10分钟内无其他脚本运行。")
+device.wakeUpIfNeeded()
+var dwc = device.width/2;
+var dhc = device.height/2;
+var dw = device.width;
+var dh = device.height;
+setScreenMetrics(1080, 2340);//设定初始屏幕比例
+const {slide_time} = hamibot.env;//载入滑屏时间
+const {gest} = hamibot.env;//载入开屏方式
+const {huaping} = hamibot.env;//载入自定义开屏选项
+const {token} = hamibot.env;//载入信息推送配置
+const {lock} = hamibot.env;//载入密码方式
+const {mima} = hamibot.env;//读取配置中密码
+function tuisong(token,etitle,content){
+  http.get("http://www.pushplus.plus/send?token="+token+"&title="+etitle+"&content="+content+"&template=html", {}, function(res, err) {    
+    if (err) {
+      console.error("微信公众号推送失败");
+      return;
+		}
+	});
+}
+function show(){
+    var now = new Date();
+    var year = now.getFullYear(); //得到年份
+    var month = now.getMonth()+1;//得到月份
+    var date = now.getDate();//得到日期
+    var hour= now.getHours();//得到小时数
+    var minute= now.getMinutes();//得到分钟数
+    var second= now.getSeconds();//得到秒数
+    var shijian = year + "年" + month + "月" + date + "日" + hour + "时" + minute + "分" + second + "秒"
+    return shijian
+}
+function wenbendianji(wenbenneirong){
+  var b = text(wenbenneirong).findOne().bounds();
+  log("点击", wenbenneirong);
+  click(b.centerX(), b.centerY());
+}
+log(dw+"-"+dh)
+log("配置加载成功")
+sleep(1000)
+var a = Number(slide_time)
+var No = "no", Up = "up", Down = "down", Right = "right", Left = "left", Ziyou = "ziyou";
+switch (gest) {
+  case No : 
+    log("无需上滑解锁");
+    break;
+  case Up :
+    swipe(570,1799,580,777,a)
+    log("上滑解锁成功");
+    sleep(1000);
+    break;
+  case Down :
+    swipe(500,777,500,1799,a);
+    log("下滑解锁成功");
+    sleep(1000);
+    break;
+  case Right :
+    swipe(0,700,1050,700,a);
+    log("右滑解锁成功");
+    sleep(1000);
+    break;
+  case Left :
+    swipe(1050,700,0,700,a);
+    log("左滑解锁成功");
+    sleep(1000);
+    break;
+  case Ziyou :
+    var arr = huaping.split("-")
+    var pwd = []
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        var dot = []
+        dot[0] = x
+        dot[1] = y
+        pwd.push(dot)
+    }//解析坐标构造解锁坐标数组
+    sleep(800)
+    gesture(1700, pwd)
+    sleep(1000);
+    break;
+}//唤醒设备后上滑进入解锁界面
+sleep(100)
+var A = "a", B = "b", C = "c", D = "d"
+log(1)
+switch (lock) {
+  case A :
+    var str = mima.toString();
+    var arr = str.split("");//将密码转为数组
+    for(var x = 0 ; x < arr.length ; x = x + 1){
+      desc(arr[x]).findOne().click();//依此读取数字中的数字并进行输入解锁
+      var c = x + 1
+      log("输入第", c ,"位密码中，请稍后……")
+      sleep(100);
+    };
+    sleep(200);
+    break;
+  case B :
+    var arr = mima.split("-")
+    var pwd = []
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        var dot = []
+        dot[0] = x
+        dot[1] = y
+        pwd.push(dot)
+    }//解析坐标构造解锁坐标数组
+    sleep(800)
+    gesture(1700, pwd)
+    sleep(1000);
+    break;
+  case C :
+    var arr = mima.split("-")
+    for (var i = 0; i < arr.length; i++) {
+        var temp = arr[i].split(",")
+        var x = Number(temp[0])
+        var y = Number(temp[1])
+        press(x, y, 200)
+    }//解析坐标构造解锁坐标数组,并依次点击。
+    sleep(1000);
+    break;
+  case D :
+    log("未锁定，开始执行正常流程。");
+    break;
+}
+sleep(1000)
+toast("A04版本是最后依托于hamibot平台构建的版本，新版本【B01】将正式脱离hamibot平台")
+sleep(1000)
+toast("欢迎加入脚本交流群：772442302，密码：咸鱼")
+log("A04版本是最后依托于hamibot平台构建的版本，新版本【B01】将正式脱离hamibot平台，欢迎加入脚本交流群：772442302，密码：咸鱼")
+sleep(3000);
+log('开始打卡');
+launch('com.tencent.mm');
+sleep(3000)
+if(id("dub").className("android.widget.TextView").text("通讯录").exists()){
+  log('处于微信主界面')
+}else{
+  log('未处于微信主界面，开始执行返回操作')
+	for(var i = 0; i < 20; i++){
+    back()
+    sleep(100)
+  }
+  launch('com.tencent.mm');
+}
+sleep(2000)
+log('开始每日上报流程');
+sleep(300);
+wenbendianji("通讯录")
+sleep(1000)
+wenbendianji("公众号")
+sleep(2000)
+do {
+  if(text("青岛农业大学学工在线").findOne){
+    wenbendianji("青岛农业大学学工在线")
+  }
+  var i = 0
+  if(i>0){
+    swipe(500, 2000, 500, 200, 300);
+  }
+  sleep(100);
+  i++
+  if(i>90){
+    log('未发现公众号，请重试')
+    tuisong(token,"上报出现错误","警告：下滑90次内未发现青岛农业大学学工在线公众号")
+    exit();
+  }
+}while(!text("青岛农业大学学工在线").findOne)
+sleep(2000)
+log('进入青岛农业大学学工在线公众号')
+wenbendianji("信息上报")
+sleep(100)
+if(text("微信登录").findOne().bounds()){
+  className("android.widget.Button").clickable(true).depth(20).findOne().click()
+  sleep(100)
+  wenbendianji("允许")
+}
+sleep(1000)
+if(className("android.view.View").text("其他登录方式").exists()){
+  className("android.widget.Button").clickable(true).depth(20).findOne().click()
+}
+sleep(2000)
+if(className("android.widget.TextView").text("疫情防控").exists()){
+  log("一切正常")
+}else{
+  sleep(3000)
+  log("警告：出现异常点")
+}
+log('等待加载页面')
+wenbendianji("每日上报")
+toast('每日上报');
+log('开始执行每日上报流程')
+sleep(4000);
+for(var i = 0;i < 10 ; i++){
+  sleep(1000)
+	swipe(500, 2000, 500, 200, 1000);
+}
+wenbendianji("本人承诺以上填报数据真实有效。（请打勾后提交数据）")
+wenbendianji("提 交")
+//加入成功上报查找函数
+var endtime = "脚本结束运行时间为：" + show();
+if(text("提交成功").findOne().bounds()){
+	log(endtime);
+  var aaa = starttime + endtime + "QAU每日上报助手已帮您完成平安上报";
+  tuisong(token,"回执：成功上报", aaa);
+}else if(text("今日您已经上报，无需重复上报").findOne().bounds()){
+  log(endtime);
+  var aaa = starttime + endtime + "今日您已经上报，无需重复上报"
+  tuisong(token,"回执：您已经上报", aaa);
+}else{
+  log(endtime);
+  var aaa = starttime + endtime + "出现未知原因故障，请重试"
+  tuisong(token,"错误回执", aaa);
+}
+log('填报已完成，结果请查看推送反馈')
+sleep(1000);
+home();
+sleep(1000);
+launch('com.android.bbk.lockscreen3');
+log('脚本执行完毕')
+threads.shutDownAll()
+exit();
+------------------------------配置文件-------------------------------
+[
+  {
+    "label": "解锁手势",
+    "type": "select",
+    "name": "gest",
+    "options": {
+      "no": "无",
+      "up": "上滑",
+      "down": "下滑",
+      "left": "左滑",
+      "right": "右滑",
+      "ziyou": "自由解锁"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "划屏坐标",
+    "name": "huaping",
+    "help": "自定义开屏请按首页方法填写坐标。坐标请按照【X,Y-X,Y……】的方法填写。注意使用的是英文符号。"
+  },
+  {
+    "label": "解锁延时",
+    "name": "slide_time",
+    "validation": "required"
+  },
+  {
+    "label": "屏幕锁定方式",
+    "type": "select",
+    "help": "注意，选择无锁的话下面的随便填",
+    "name": "lock",
+    "options": {
+      "a": "数字锁",
+      "b": "图形锁",
+      "c": "混合锁",
+      "d": "无锁"
+    },
+    "validation": "required"
+  },
+  {
+    "label": "密码或锁屏坐标",
+    "name": "mima",
+    "help": "混合锁请按首页方法填写坐标。坐标请按照【X,Y-X,Y……】的方法填写。注意使用的是英文符号。"
+  },
+  {
+    "label": "token",
+    "name": "token",
+    "Help": "不用瞎写就好。"
+  }
+]
